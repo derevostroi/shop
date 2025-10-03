@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Магазин LEGO & Arduino</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    header { background: #0077cc; color: white; padding: 15px; text-align: center; }
+    nav { background: #005fa3; padding: 10px; text-align: center; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+
+    .container { width: 90%; margin: 20px auto; }
+    h1, h2 { text-align: center; }
+
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .product { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); text-align: center; }
+    .product img { max-width: 100%; height: 150px; object-fit: contain; }
+    .product h3 { margin: 10px 0; }
+    .price { font-weight: bold; margin: 10px 0; }
+    .btn { background: #0077cc; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+    .btn:hover { background: #005fa3; }
+
+    #cart { margin-top: 30px; }
+    #cart table { width: 100%; border-collapse: collapse; }
+    #cart th, #cart td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    #cart th { background: #0077cc; color: white; }
+    #total { font-size: 18px; font-weight: bold; margin-top: 15px; text-align: right; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Магазин LEGO & Arduino</h1>
+    <p>LEGO поезда, Arduino Mega и Minecraft-товары</p>
+  </header>
+
+  <nav>
+    <a href="#catalog">Каталог</a>
+    <a href="#cart">Корзина</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+
+  <div class="container" id="catalog">
+    <h2>Каталог товаров</h2>
+    <div class="products">
+      <div class="product">
+        <img src="https://www.lego.com/cdn/cs/set/assets/blt6f4a31e2e5a9a6f5/60198_alt1.jpg" alt="LEGO поезд">
+        <h3>LEGO Грузовой поезд</h3>
+        <p class="price">12000 ₽</p>
+        <button class="btn" onclick="addToCart('LEGO Грузовой поезд', 12000)">В корзину</button>
+      </div>
+      <div class="product">
+        <img src="https://content.arduino.cc/mega.jpg" alt="Arduino Mega">
+        <h3>Arduino Mega 2560</h3>
+        <p class="price">2500 ₽</p>
+        <button class="btn" onclick="addToCart('Arduino Mega 2560', 2500)">В корзину</button>
+      </div>
+      <div class="product">
+        <img src="https://m.media-amazon.com/images/I/71z4c2gJGQL._AC_SL1500_.jpg" alt="Minecraft фигурка">
+        <h3>Minecraft фигурка</h3>
+        <p class="price">1500 ₽</p>
+        <button class="btn" onclick="addToCart('Minecraft фигурка', 1500)">В корзину</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="cart">
+    <h2>Корзина</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Товар</th>
+          <th>Цена</th>
+          <th>Количество</th>
+          <th>Итого</th>
+          <th>Удалить</th>
+        </tr>
+      </thead>
+      <tbody id="cartItems"></tbody>
+    </table>
+    <div id="total">Итого: 0 ₽</div>
+    <button class="btn" onclick="checkout()">Оформить заказ</button>
+  </div>
+
+  <div class="container" id="contacts">
+    <h2>Контакты</h2>
+    <p>Email: shop@example.com</p>
+    <p>Телефон: +7 999 123-45-67</p>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(product, price) {
+      let item = cart.find(i => i.name === product);
+      if (item) {
+        item.qty++;
+      } else {
+        cart.push({ name: product, price: price, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function removeFromCart(product) {
+      cart = cart.filter(i => i.name !== product);
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartItems = document.getElementById("cartItems");
+      cartItems.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        let row = `<tr>
+          <td>${item.name}</td>
+          <td>${item.price} ₽</td>
+          <td>${item.qty}</td>
+          <td>${item.price * item.qty} ₽</td>
+          <td><button class="btn" onclick="removeFromCart('${item.name}')">X</button></td>
+        </tr>`;
+        cartItems.innerHTML += row;
+        total += item.price * item.qty;
+      });
+      document.getElementById("total").innerText = "Итого: " + total + " ₽";
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        alert("Корзина пуста!");
+      } else {
+        alert("Спасибо за заказ! Товары: " + cart.map(i => i.name + " x" + i.qty).join(", "));
+        cart = [];
+        renderCart();
+      }
+    }
+  </script>
+</body>
+</html>
